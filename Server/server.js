@@ -14,7 +14,7 @@ app.use(bodyParser.urlencoded({
 app.use(bodyParser.json());
 
 //Routing
-app.use('/api/user', userRoutes);
+//app.use('/api/user', userRoutes);
 
 
 

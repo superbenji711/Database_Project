@@ -1,15 +1,20 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+import { Route, Switch, Redirect  } from 'react-router-dom';
 import {Header, TextArea} from 'semantic-ui-react';
+import Home from "./Components/Home/Home.js"
+import Calculator from "./Components/Calculator/Calculator.js"
 
-function App() {
+function App(props) {
   return (
-    <div className="App">
-      <Header>
-        Database Project
-      </Header>
-      <TextArea value={'hello world!!!'}/>
-    </div>
+    <div>
+    <Switch>    
+      <Route exact path="/Home" component={Home}  />
+      <Route exact path="/Calculator" component={Calculator} />
+      <Route exact path="/">
+        <Redirect to="/Home" />
+      </Route>
+    </Switch>
+  </div>
   );
 }
 
