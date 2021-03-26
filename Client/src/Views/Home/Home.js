@@ -2,7 +2,7 @@ import { Menu } from "semantic-ui-react";
 import React, { useState } from 'react';
 import Search from '../Search/Search.js';
 import { Container, Grid, Header, Icon, Card, Button, Modal } from "semantic-ui-react";
-import { Redirect } from "react-router";
+import { Redirect } from "react-router-dom";
 import data from '../../Test_Data/csvjson.json'
 
 const Home = (props) => {
@@ -38,13 +38,13 @@ const Home = (props) => {
 
     return (
     <div className="Home">
-        <Menu fixed='top'>
+        {/* <Menu fixed='top'>
             
             <Menu.Item onClick={setGoHome}> Home </Menu.Item> 
             <Menu.Item onClick={setGoCalculator}> Calculator </Menu.Item> 
             <Menu.Item> Correlator </Menu.Item> 
         
-        </Menu>
+        </Menu> */}
         <Container className="Container" text style={{ marginTop: '7em' }}>
             <Grid textAlign="center" verticalAlign="middle" centered>
                 <Grid.Row centered> 

@@ -1,15 +1,23 @@
 import React from 'react';
 import { Route, Switch, Redirect  } from 'react-router-dom';
 import {Header, TextArea} from 'semantic-ui-react';
-import Home from "./Components/Home/Home.js"
-import Calculator from "./Components/Calculator/Calculator.js"
+import Home from "./Views/Home/Home.js"
+import Calculator from "./Views/Calculator/Calculator.js"
+import Correlator from "./Views/Correlator/Correlator"
+import NavBar from "./Component/navigation/NavBar"
 
-function App(props) {
+
+const App= () => {
   return (
-    <div>
+    <div style={{paddingTop:10}}>
+
+    <NavBar/>
+      
     <Switch>    
       <Route exact path="/Home" component={Home}  />
       <Route exact path="/Calculator" component={Calculator} />
+      <Route exact path="/Corrlator" component={Correlator} />
+
       <Route exact path="/">
         <Redirect to="/Home" />
       </Route>

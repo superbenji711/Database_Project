@@ -36,13 +36,13 @@ const Calculator = (props) => {
 
     return (
     <div className="Calculator">
-        <Menu fixed='top'>
+        {/* <Menu fixed='top'>
             
             <Menu.Item onClick={setGoHome}> Home</Menu.Item> 
             <Menu.Item onClick={setGoCalculator}> Calculator </Menu.Item> 
             <Menu.Item> Correlator </Menu.Item> 
         
-        </Menu>
+        </Menu> */}
         <Container className="Container" text style={{ marginTop: '7em' }}>
             <Grid textAlign="center" verticalAlign="middle" centered>
                 <Grid.Row centered> 
