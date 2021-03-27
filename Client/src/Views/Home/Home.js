@@ -18,7 +18,7 @@ const Home = (props) => {
     }
 
     if (goCalculator) {
-        return <Redirect to="/Calculator"/>;
+        return <Redirect to="/Calculator" />;
     }
 
     if (goHome) {
@@ -31,50 +31,40 @@ const Home = (props) => {
     const OpenStockModal = () => {
         setShowStockModal(true);
     }
-    
+
     const CloseStockModal = () => {
         setShowStockModal(false);
     }
 
     return (
-    <div className="Home">
-        {/* <Menu fixed='top'>
-            
-            <Menu.Item onClick={setGoHome}> Home </Menu.Item> 
-            <Menu.Item onClick={setGoCalculator}> Calculator </Menu.Item> 
-            <Menu.Item> Correlator </Menu.Item> 
-        
-        </Menu> */}
-        <Container className="Container" text style={{ marginTop: '7em' }}>
-            <Grid textAlign="center" verticalAlign="middle" centered>
-                <Grid.Row centered> 
-                    <Grid.Column>
-                        <Header textAlign='center' size='huge'>
-                            Stocks Simplified
+        <div className="Home">
+
+            <Container className="Container" text style={{ marginTop: '7em' }}>
+                <Grid textAlign="center" verticalAlign="middle" centered>
+                    <Grid.Row centered>
+                        <Grid.Column>
+                            <Header textAlign='center' size='huge'>
+                                Stocks Simplified
                         </Header>
-                        
-                    </Grid.Column>
-                    
-                </Grid.Row>
-                <Grid.Row>
-                    <Button onClick={OpenStockModal}>Add a Stock to Analyze </Button>
-                </Grid.Row>
+                        </Grid.Column>
+                    </Grid.Row>
+                    <Grid.Row>
+                        <Button onClick={OpenStockModal}>Add a Stock to Analyze </Button>
+                    </Grid.Row>
                     <Modal open={showStockModal}
                         onClose={CloseStockModal}
                         closeIcon
                         centered
-                        >
-                            <Modal.Header> Search for a Stock </Modal.Header>
-                            <Search 
-                            addStock = {addStock} 
-                            CloseStockModal = {CloseStockModal}
-                            />
-                            
-                            
+                    >
+                        <Modal.Header> Search for a Stock </Modal.Header>
+                        <Search
+                            addStock={addStock}
+                            CloseStockModal={CloseStockModal}
+                        />
                     </Modal>
-            </Grid>
-      </Container>
-    </div>
+                </Grid>
+            </Container>
+        </div>
     )
 }
 

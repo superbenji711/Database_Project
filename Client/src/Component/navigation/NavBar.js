@@ -24,12 +24,8 @@ const NavBar = () => {
                         onClick={(view) => { setView("Correlator") }}>Correlator</Menu.Item>
                         </Link>
                 </Menu.Menu>
-                
             </Menu>
-            
         </div>
-
-
 
     );
 
