@@ -3,9 +3,18 @@ const config = require('./config');
 
 process.env.ORA_SDTZ = 'UTC';
 
+// try {
+//   oracledb.initOracleClient({libDir: 'C:/Users/Benji/instantclient_19_10'});
+// } catch (err) {
+//   console.error('Whoops!');
+//   console.error(err);
+//   process.exit(1);
+// }
+oracledb.initOracleClient({ libDir: 'C:/Users/Benji/instantclient_19_10' });
+
+// connection =  oracledb.getConnection(config);
+
 const database = async () => {
-   // const connection = await oracledb.getConnection(config);
-   let connection;
 
    try {
  
@@ -36,27 +45,27 @@ const database = async () => {
      // Insert three rows
      //
  
-     sql = `INSERT INTO no_example VALUES (:1, :2)`;
+    //  sql = `INSERT INTO no_example VALUES (:1, :2)`;
  
-     binds = [
-       [101, "Alpha" ],
-       [102, "Beta" ],
-       [103, "Gamma" ]
-     ];
+    //  binds = [
+    //    [101, "Alpha" ],
+    //    [102, "Beta" ],
+    //    [103, "Gamma" ]
+    //  ];
  
-     // For a complete list of options see the documentation.
-     options = {
-       autoCommit: true,
-       // batchErrors: true,  // continue processing even if there are data errors
-       bindDefs: [
-         { type: oracledb.NUMBER },
-         { type: oracledb.STRING, maxSize: 20 }
-       ]
-     };
+    //  // For a complete list of options see the documentation.
+    //  options = {
+    //    autoCommit: true,
+    //    // batchErrors: true,  // continue processing even if there are data errors
+    //    bindDefs: [
+    //      { type: oracledb.NUMBER },
+    //      { type: oracledb.STRING, maxSize: 20 }
+    //    ]
+    //  };
  
-     result = await connection.executeMany(sql, binds, options);
+    //  result = await connection.executeMany(sql, binds, options);
  
-     console.log("Number of rows inserted:", result.rowsAffected);
+    //  console.log("Number of rows inserted:", result.rowsAffected);
  
      //
      // Query the data
@@ -69,26 +78,19 @@ const database = async () => {
      // For a complete list of options see the documentation.
      options = {
        outFormat: oracledb.OUT_FORMAT_OBJECT,   // query result format
-       // extendedMetaData: true,               // get extra metadata
-       // prefetchRows:     100,                // internal buffer allocation size for tuning
-       // fetchArraySize:   100                 // internal buffer allocation size for tuning
+      //  extendedMetaData: true,               // get extra metadata
+      //  prefetchRows:     100,                // internal buffer allocation size for tuning
+      //  fetchArraySize:   100                 // internal buffer allocation size for tuning
      };
  
-     result = await connection.execute(sql, binds, options);
+     result = await connection.execute("SELECT * FROM mlia.SECTOR");
  
+
      console.log("Metadata: ");
      console.dir(result.metaData, { depth: null });
      console.log("Query results: ");
      console.dir(result.rows, { depth: null });
  
-     //
-     // Show the date.  The value of ORA_SDTZ affects the output
-     //
- 
-     sql = `SELECT TO_CHAR(CURRENT_DATE, 'DD-Mon-YYYY HH24:MI') AS CD FROM DUAL`;
-     result = await connection.execute(sql, binds, options);
-     console.log("Current date query results: ");
-     console.log(result.rows[0]['CD']);
  
    } catch (err) {
      console.error(err);
@@ -103,4 +105,4 @@ const database = async () => {
    }
 }
 
-// database();
+database();
