@@ -16,7 +16,7 @@ const App= () => {
     <Switch>    
       <Route exact path="/Home" component={Home}  />
       <Route exact path="/Calculator" component={Calculator} />
-      <Route exact path="/Corrlator" component={Correlator} />
+      <Route exact path="/Correlator" component={Correlator} />
 
       <Route exact path="/">
         <Redirect to="/Home" />

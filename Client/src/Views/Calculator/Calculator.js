@@ -1,10 +1,11 @@
 import { Button, Input, Menu, Segment } from "semantic-ui-react";
 import React, { useState } from 'react';
-import Search from '../../Component/SearchBar';
+import Search from '../../Component/searchbar';
 import { Redirect } from "react-router-dom";
 import { Container, Grid, Header, Dropdown, Icon } from "semantic-ui-react";
 import data from '../../Test_Data/csvjson.json'
 import timeData from './months.json'
+
 const Calculator = (props) => {
 
     const [showStockModal, setShowStockModal] = useState(false);
@@ -96,7 +97,6 @@ const Calculator = (props) => {
 
                 <Container className={'container3'}>
                     <Header style={{ textAlign: 'center', fontSize: 30, color: 'blue' }}>Calculate <Icon size={12} circular name={"angle double right"} /></Header>
-
                     <Button style={{ width: 650, textAlign: 'center', }} color={'blue'} > Profit: ${111.55}</Button>
                 </Container>
             </Container>
