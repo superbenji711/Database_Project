@@ -11,10 +11,14 @@ const Home = (props) => {
     const [goHome, setGoHome] = useState(false);
     const [goCalculator, setGoCalculator] = useState(false);
     const [selectedStock, setSelectedStock] = useState(null);
+    const [stocks, setStocks] = useState([]);
 
     const addStock = (data) => {
         setSelectedStock(data)
         console.log(data)
+        let temp = stocks
+        temp.push(data)
+        setStocks(data)
     }
 
     if (goCalculator) {
