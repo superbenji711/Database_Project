@@ -9,7 +9,7 @@ import NavBar from "./Component/navigation/NavBar"
 
 const App= () => {
   return (
-    <div style={{paddingTop:10}}>
+    <div>
 
     <NavBar/>
       

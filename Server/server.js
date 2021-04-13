@@ -1,21 +1,10 @@
-const bodyParser = require("body-parser"); //once a request is recived you can manipulate it
-const cors = require('cors');  //send api calls through diffrent ports
-const express = require('express');
-const app = express();
-const config = require("./config.js");
-const database = require("./Database.js");
-const router = express.Router();
+const express = require('./express.js')
+const path = require('path');
 
-const sectorRoutes = require("./Routes/sectorRoute");
+const port = 5000;
 
-require('dotenv').config()
-app.use(cors()); // Allow API calls to be made from any origin
-app.use(bodyParser.urlencoded({
-  extended: true
-}));
+const app = express.init()
 
-app.use(bodyParser.json());
 
-//Routing
-app.use('/api/sector', sectorRoutes);
+app.listen(port, () => console.log(`Server now running on port ${port}!`));
 

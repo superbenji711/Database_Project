@@ -16,6 +16,7 @@ exports.getAll = async (req, res) => {
      console.dir(result.metaData, { depth: null });
      console.log("Query results: ");
      console.dir(result.rows, { depth: null });
+     res.send(result.rows)
 }
 
 exports.get = async (id) => {
