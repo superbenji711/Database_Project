@@ -3,17 +3,15 @@ const config = require('./config');
 
 process.env.ORA_SDTZ = 'UTC';
 
-// try {
-//   oracledb.initOracleClient({libDir: 'C:/Users/Benji/instantclient_19_10'});
-// } catch (err) {
-//   console.error('Whoops!');
-//   console.error(err);
-//   process.exit(1);
-// }
-oracledb.initOracleClient({ libDir: 'C:/Users/Benji/instantclient_19_10' });
+try {
+  oracledb.initOracleClient({libDir: 'C:/Users/Benji/instantclient_19_10'});
+} catch (err) {
+  console.error('Whoops!');
+  console.error(err);
+  process.exit(1);
+}
 
-// connection =  oracledb.getConnection(config);
-
+let connection;
 const database = async () => {
 
    try {

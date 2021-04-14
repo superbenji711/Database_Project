@@ -5,14 +5,67 @@ import { Redirect } from "react-router-dom";
 import { Container, Grid, Header, Dropdown, Icon } from "semantic-ui-react";
 import data from '../../Test_Data/csvjson.json'
 import timeData from './months.json'
-const Calculator = (props) => {
+import axios from 'axios';
+
+
+
+
+const Calculator =  (props) => {
 
     const [showStockModal, setShowStockModal] = useState(false);
     const [selectedStock, setSelectedStock] = useState(null);
     const [goHome, setGoHome] = useState(false);
     const [goCalculator, setGoCalculator] = useState(false);
+    
 
+    // const help = async () =>{
+    //      await axios.get('/api/sector/' )
+    //   .then(response => {
+    //         console.log(response)
+    //         console.log("whats up")
+
+    //   })
+    //   .catch(function (error) {
+    //     console.log(error);
+    //   })
+    // }
+
+    // const help1 =  async() =>{
+    //      await axios.get('/api/CPI/')
+    //   .then(response => {
+    //     return(
+    //     <Input>
+    //         {console.log(response.data)}
+    //      </Input>
+    //     )
+    //   })
+    //   .catch(function (error) {
+    //     console.log(error);
+    //   })
+    // }
+    let output;
+    // const res =  axios.get(`http://localhost:3001/api/sector/`)
+    // .then((response) => {
+    //     output =response.json();
+    //    });
+    
+
+    const test = async() => {
+        let apiRes = null;
+        try {
+          apiRes = await axios.get('/sector');
+        } catch (err) {
+          apiRes = err.response;
+          console.log("mf sucka");
+
+        } finally {
+          console.log(apiRes); // Could be success or error
+        }
+      };
+     
     return (
+
+        
         <div className="Calculator">
 
             <Container className="Container" style={{ marginTop: '7em' }}>
@@ -20,6 +73,16 @@ const Calculator = (props) => {
                 <Header style={{ textAlign: 'center', fontSize: 40, fontWeight: 'bold' }}> Stock Transaction Calculator</Header>
                 </Container>
                 <Search />
+                <Button onClick={  () =>  test()} size={'big'}>
+                    <Segment>
+
+                    </Segment>
+                </Button>
+                <Segment>
+                    <Input defaultValue={output}>
+                    {/* {()=>console.log(res)} */}
+                    </Input>
+                </Segment>
                 <Container className={'container1'} >
                     <Segment>
                         <Grid columns={4} centered>
