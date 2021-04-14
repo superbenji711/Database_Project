@@ -15,12 +15,3 @@ exports.getAll = async (req, res) => {
     console.dir(result.rows, { depth: null });
 }
 
-exports.get = async (id) => {
-
-}
-
-exports.update = async (req, res) => {
-    //i dont think we need to update stuff
-
-}
-

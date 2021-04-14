@@ -11,34 +11,10 @@ exports.getAll = async (req, res) => {
     bind={}
     connection = await oracledb.getConnection(config);
     
-    // results = await connection.query(sql, (error, result, fields)=>{
+    results = await connection.execute(sql);
 
-    //     if(error){throw error}
-
-    //     res.send(result);
-    // });
-    const result = connection.execute(
-        sql,
-        [],  
-       function(err, result) {
-          if (err) {
-            console.error(err.message);
-            return;
-          }
-          console.log(result.rows);
-       });
-  
-    res.send(result);
-    // console.log("Metadata: ");
-    //  console.dir(result.metaData, { depth: null });
-    //  console.log("Query results: ");
-    //  console.dir(result.rows, { depth: null });
-        
+    res.send(results.rows);
      
-}
-
-exports.get = async (id) => {
-
 }
 
 
