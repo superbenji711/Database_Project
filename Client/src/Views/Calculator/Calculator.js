@@ -1,6 +1,6 @@
 import { Button, Input, Menu, Segment } from "semantic-ui-react";
 import React, { useState } from 'react';
-import Search from '../../Component/SearchBar';
+import Search from '../../Component/searchbar';
 import { Redirect } from "react-router-dom";
 import { Container, Grid, Header, Dropdown, Icon } from "semantic-ui-react";
 import data from '../../Test_Data/csvjson.json'
