@@ -1,9 +1,5 @@
-const { response } = require('express');
 const oracledb = require('oracledb');
 const config = require('../config');
-
-
-
 
 
 exports.getAll = async (req, res) => {

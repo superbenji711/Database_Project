@@ -1,11 +1,25 @@
 import React,{ useState, useEffect } from 'react';
 import {Container,Header,Grid,Button,Label} from 'semantic-ui-react';
-import Search from '../../Component/searchbar';
+import Search from '../../Component/SearchBar';
 import CanvasJSReact from '../../Assets/canvasjs.stock.react';
+import axios from 'axios';
+
 var CanvasJS = CanvasJSReact.CanvasJS;
 var CanvasJSStockChart = CanvasJSReact.CanvasJSStockChart;
 
 const Correlator = () =>{
+    
+    const CPI = async() => {
+        let apiRes = null;
+        try {
+          apiRes = await axios.get('http://localhost:3001/api/CPI');
+        } catch (err) {
+          apiRes = err.response;
+        } finally {
+        //   console.log(apiRes); // Could be success or error
+        }
+      };
+    
     const [dataPoints, setDataPoints] = useState([]);
     const [isLoaded, setLoaded] = useState(false);
     const [risesActive, setRisesActive] = useState(true);
