@@ -4,6 +4,7 @@ import Search from '../Search/Search.js';
 import { Container, Grid, Header, Icon, Card, Button, Modal } from "semantic-ui-react";
 import { Redirect } from "react-router-dom";
 import data from '../../Test_Data/csvjson.json'
+import {testCall} from "../../API/testAPI"
 
 const Home = (props) => {
 
@@ -12,6 +13,10 @@ const Home = (props) => {
     const [goCalculator, setGoCalculator] = useState(false);
     const [selectedStock, setSelectedStock] = useState(null);
     const [stocks, setStocks] = useState([]);
+
+    const test = async() => {
+        const a = (await testCall().data);
+    }
 
     const addStock = (data) => {
         setSelectedStock(data)
@@ -54,6 +59,7 @@ const Home = (props) => {
                     </Grid.Row>
                     <Grid.Row>
                         <Button onClick={OpenStockModal}>Add a Stock to Analyze </Button>
+                        <Button onClick={test}> Test</Button>
                     </Grid.Row>
                     <Modal open={showStockModal}
                         onClose={CloseStockModal}
