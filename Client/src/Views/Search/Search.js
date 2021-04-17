@@ -4,11 +4,7 @@ import data from '../../Test_Data/csvjson.json'
 
 const Search = (props) => {
     
-
-    //You will need to save the value from the textbox and update it as it changes
-    //You will need the onChange value for the input tag to capture the textbox value
     const [preSelectedStock, setPreSelectedStock] = useState(null);
-    const [addStockPage, setAddStockPage] = useState(false);
     
     const addStockTime = () => {
        if (preSelectedStock != null) {

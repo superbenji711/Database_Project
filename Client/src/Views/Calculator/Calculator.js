@@ -21,8 +21,9 @@ const Calculator =  (props) => {
 
     const sector = async() => {
         let apiRes = null;
+        console.log('trying')
         try {
-          apiRes = await axios.get('http://localhost:3001/api/sector');
+          apiRes = await axios.get('http://localhost:3001/api/index');
         } catch (err) {
           apiRes = err.response;
           console.log("mf sucka");
@@ -42,7 +43,7 @@ const Calculator =  (props) => {
                 <Header style={{ textAlign: 'center', fontSize: 40, fontWeight: 'bold' }}> Stock Transaction Calculator</Header>
                 </Container>
                 <Search />
-                <Button  size={'big'}>
+                <Button  size={'big'} onClick={sector}>
                     <Segment>
 
                     </Segment>
