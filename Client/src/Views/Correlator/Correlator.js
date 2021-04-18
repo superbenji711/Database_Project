@@ -1,8 +1,10 @@
 import React, {useState} from 'react';
+
 import {Container,Header,Grid,Button, Input, Form, Modal, GridColumn} from 'semantic-ui-react';
-import Search from '../Search/Search.js';
+import Search from '../Search/Search';
 import axios from 'axios';
-import CanvasJSReact from "../../Assets/canvasjs.stock.react";
+import CanvasJSReact from "../../Assets/canvasjs.react";
+var { jStat } = require('jstat');
 var CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
 const Correlator = () =>{
@@ -14,6 +16,7 @@ const Correlator = () =>{
     const [isLoaded, setLoaded] = useState(false);
     const [showMSChart, setShowMSChart] = useState(false);
     const [showCPIChart, setShowCPIChart] = useState(false);
+
     const [showMonthModal, setShowMonthModal] = useState(false);
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
@@ -123,6 +126,8 @@ const Correlator = () =>{
         }
     }
 
+
+
     const cpiCorrelator = async() => {
         if (selectedStock == null){
             alert('You did not select a stock')
@@ -143,10 +148,28 @@ const Correlator = () =>{
           console.log(apiRes.data); // Could be success or error
         }
         let datapoints = []
-        apiRes.data.map(d=>(
-            datapoints.push({label:d[0],y:d[1]})
-        ))
+        let additionalData = []
+        apiRes.data.map(d=>
+            {// check if significant
+            let pvalue = jStat.ttest(d[2],d[3],2);
+            let sig = '';
+            if (pvalue < 0.10) {sig = '*'}
+            datapoints.push({
+                label:d[0],
+                y:d[1],
+            })
+            additionalData.push({
+                label:d[0],
+                y:d[2],
+                indexLabel: `${sig}`, 
+                indexLabelFontColor: "white", 
+                indexLabelOrientation: "horizontal", 
+                indexLabelPlacement: "inside"
+            })
+            }
+        )
         setDataPoints(datapoints);
+        setAdditionalData(additionalData);
         setLoaded(true);
         setShowCPIChart(true);
     };
@@ -210,12 +233,25 @@ const Correlator = () =>{
     }
     const cpiChart = {
         title: {
-            text: "CPI Correlation By Category"
+            text: "Correlation Between Avg Monthly Stock Value and Monthly % Change In CPI By Category"
         },
-        data: [
+        data: 
+        [
         {
+            showInLegend: true, 
+            name: "series1",
+            legendText: "Correlation Coefficient",
+            indexLabelFontSize: 40,
             type: "column",
             dataPoints: dataPoints
+        },
+        {
+            showInLegend: true, 
+            name: "series2",
+            legendText: "T-test Score",
+            indexLabelFontSize: 40,
+            type: "column",
+            dataPoints: additionalData
         }
         ]
     }
@@ -259,8 +295,8 @@ const Correlator = () =>{
                 <Header textAlign='center'>Based on Economic Indicators</Header>
                 <Grid.Row fluid>
                     <Button style={{width: 200,textAlign: 'center',}} onClick={cpiCorrelator}>Consumer Price Index</Button>
-                    <Button style={{width: 200,textAlign: 'center',}} onClick={msCorrelator}>Money Stock</Button>
-                    <Button style={{width: 200,textAlign: 'center',}} onClick={OpenMonthModal}>sectorPerformance </Button>
+                    <Button style={{width: 200,textAlign: 'center',}} onClick={msCorrelator}>Money Stock</Button>       
+                     <Button style={{width: 200,textAlign: 'center',}} onClick={OpenMonthModal}>sectorPerformance </Button>
                 </Grid.Row>
                 <Grid.Row style={{paddingTop:50}}>
                     <Grid.Column>
@@ -270,7 +306,7 @@ const Correlator = () =>{
                 </Grid.Row>
                 <Grid.Row style={{paddingTop:50}}>
                     {isLoaded ? null : <Header>Loading...</Header>}
-                    {showCPIChart ? <CanvasJSChart options = {cpiChart}/> : null}
+                    {showCPIChart ? <div style={{width:'100%'}}><CanvasJSChart options = {cpiChart}/><Header>*Statistically Significant: T-test score of correlation coefficient has p-value {"< 0.10"}</Header></div> : null}
                     {showMSChart ? <CanvasJSChart options = {msChart}/> : null}
                     {showSectorGraph ? <CanvasJSChart options = {sectorDataPoints}/> : null}
                 </Grid.Row>

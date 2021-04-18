@@ -5,6 +5,6 @@ const express = require('express');
 const cpiRouter = express.Router();
 
 
-cpiRouter.get('/', cpiController.getAll); //get all
+cpiRouter.get('/:symbol', cpiController.getCorrelation); //get correlations
 
 module.exports = cpiRouter;

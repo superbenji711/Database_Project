@@ -23,7 +23,7 @@ app.use(cors()); // Allow API calls to be made from any origin
 //Routing
 app.use('/api/sector', sectorRoutes);
 app.use('/api/CPI', cpiRoutes);
-app.use('/api/Stock', moneyStockRoutes);
+app.use('/api/moneystock', moneyStockRoutes);
 app.use('/api/GDP',gdpRoute);
 app.use('/api/Index',indexRoute);
 app.use('/api/WEI',weiRoute);

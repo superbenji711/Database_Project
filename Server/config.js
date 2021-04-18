@@ -1,14 +1,14 @@
 
 // oracle.cise.ufl.edu
 module.exports = {
-  user          :  "blabonte",
+  user          :  "mlia",
 
   // Get the password from the environment variable
   // NODE_ORACLEDB_PASSWORD.  The password could also be a hard coded
   // string (not recommended), or it could be prompted for.
   // Alternatively use External Authentication so that no password is
   // needed.
-  password : "BenjiPrime7110521",
+  password : "Eadgbe1924",
 
   // For information on connection strings see:
   // https://oracle.github.io/node-oracledb/doc/api.html#connectionstrings
