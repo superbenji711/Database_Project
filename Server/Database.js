@@ -6,7 +6,7 @@ process.env.ORA_SDTZ = 'UTC';
 
 module.exports.init = () => {
 try {
-  oracledb.initOracleClient({libDir: 'C:/Users/Benji/instantclient_19_10'});
+  oracledb.initOracleClient({libDir: 'C:/Users/vandy/instantclient'});
 } catch (err) {
   console.error('Whoops!');
   console.error(err);

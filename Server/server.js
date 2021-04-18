@@ -11,6 +11,7 @@ const moneyStockRoutes = require("./Routes/moneyStockRoute");
 const gdpRoute = require('./Routes/gdpRoute');
 const indexRoute = require('./Routes/indexRoute');
 const weiRoute = require('./Routes/weiRoute');
+const stockRoute = require('./Routes/stockRoutes');
 
 database.init();
 
@@ -24,8 +25,8 @@ app.use('/api/sector', sectorRoutes);
 app.use('/api/CPI', cpiRoutes);
 app.use('/api/Stock', moneyStockRoutes);
 app.use('/api/GDP',gdpRoute);
-app.use('/api/Index',indexRoute)
-app.use('/api/WEI',weiRoute)
+app.use('/api/Index',indexRoute);
+app.use('/api/WEI',weiRoute);
 
 
 //server
