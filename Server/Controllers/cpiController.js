@@ -7,7 +7,9 @@ exports.getCorrelation = async (req, res) => {
     sql = 
         `SELECT * FROM 
         (
-        SELECT category, CORR(stock_zscore, cpi_zscore) AS correlation
+            SELECT category, CORR(stock_zscore, cpi_zscore) correlation,
+            ( CORR(stock_zscore, cpi_zscore) / (SQRT((1-POWER(CORR(stock_zscore, cpi_zscore),2))/(COUNT(month)-2))) ) as tvalue,
+            COUNT(month) AS n
             FROM ( 
                 SELECT name, symbol, sector, month, year, stock_zscore, cpi_zscore, category
                 FROM (
@@ -20,20 +22,41 @@ exports.getCorrelation = async (req, res) => {
                         ) JOIN (
                             SELECT month AS stockMonth,year AS stockYear, monthlyMean, stock_zscore
                             FROM ( 
-                                WITH zscore_table AS( SELECT AVG(open_val) mean, STDDEV(open_val) std FROM MLMATOLI.stock_value WHERE stock_id =  '${symbol}')
-                                SELECT month, year, monthlyMean, (monthlyMean-mean)/std AS stock_zscore
+                                WITH zscore_table AS( 
+                                    SELECT AVG(monthlyMean) as mean, STDDEV(monthlyMean) as std
+                                    FROM (
+                                        SELECT (AVG(close_val)-prevMonthlyMean) AS monthlyMean
+                                        FROM MLMATOLI.stock_value JOIN
+                                        (
+                                            SELECT to_char(stock_date,'MM') month, to_char(stock_date,'YYYY') year, AVG(close_val) AS prevMonthlyMean
+                                            FROM mlmatoli.stock_value
+                                            WHERE stock_id = '${symbol}'
+                                            GROUP BY to_char(stock_date,'MM'),to_char(stock_date,'YYYY')                      
+                                        )
+                                        ON (to_number(to_char(stock_date,'MM'))-1) = to_number(month) AND to_number(to_char(stock_date,'YYYY')) = to_number(year)
+                                        WHERE stock_id = '${symbol}'
+                                        GROUP BY to_char(stock_date,'MM'),to_char(stock_date,'YYYY'), prevMonthlyMean, close_val
+                                    )
+                                )
+                                SELECT month, year, monthlyMean,(monthlyMean-mean)/std AS stock_zscore
                                 FROM ( 
-                                    SELECT to_char(stock_date,'MM') month,to_char(stock_date,'YYYY') year, AVG(open_val) monthlyMean 
-                                    FROM MLMATOLI.stock_value 
+                                    SELECT to_char(stock_date,'MM')month, to_char(stock_date,'YYYY')year, (AVG(close_val)-prevMonthlyMean) AS monthlyMean
+                                    FROM MLMATOLI.stock_value JOIN
+                                    (
+                                        SELECT to_char(stock_date,'MM') month, to_char(stock_date,'YYYY') year, AVG(close_val) AS prevMonthlyMean
+                                        FROM mlmatoli.stock_value
+                                        WHERE stock_id = '${symbol}'
+                                        GROUP BY to_char(stock_date,'MM'),to_char(stock_date,'YYYY')                            
+                                    )
+                                    ON (to_number(to_char(stock_date,'MM'))-1) = to_number(month) AND to_number(to_char(stock_date,'YYYY')) = to_number(year)
                                     WHERE stock_id = '${symbol}'
-                                    GROUP BY to_char(stock_date,'MM'),to_char(stock_date,'YYYY')
-                                    ORDER BY to_char(stock_date,'YYYY')
+                                    GROUP BY to_char(stock_date,'MM'),to_char(stock_date,'YYYY'), prevMonthlyMean
                                 ), zscore_table
                             )
                         ) ON month = stockMonth AND year = stockYear),( SELECT name, symbol, sector FROM mlia.sector WHERE symbol =  '${symbol}')
                         ORDER BY year 
             )
-            GROUP BY name, symbol, sector, category
+            GROUP BY category
         )
         `
     bind={}
