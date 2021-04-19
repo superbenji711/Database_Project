@@ -3,7 +3,7 @@ import { Dropdown, Button, Grid, Header} from 'semantic-ui-react'
 import axios from 'axios';
 
 const Search = (props) => {
-    
+    const [data, setData] = useState(null)
     const [preSelectedStock, setPreSelectedStock] = useState(null);
     
     const addStockTime = () => {
