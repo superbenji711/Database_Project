@@ -3,9 +3,7 @@ import { Dropdown, Button, Grid, Header} from 'semantic-ui-react'
 import axios from 'axios';
 
 const Search = (props) => {
-    //You will need to save the value from the textbox and update it as it changes
-    //You will need the onChange value for the input tag to capture the textbox value
-    const [data, setData] = useState([[]]);
+    
     const [preSelectedStock, setPreSelectedStock] = useState(null);
     
     const addStockTime = () => {
@@ -67,3 +65,4 @@ const Search = (props) => {
 };
 
 export default Search;
+

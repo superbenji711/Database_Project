@@ -1,9 +1,9 @@
 import React, {useState, useEffect} from 'react';
-import { Dropdown, Button} from 'semantic-ui-react'
-import data from '../../Test_Data/csvjson.json'
+import { Dropdown, Button, Grid, Header} from 'semantic-ui-react'
+import axios from 'axios';
 
 const Search = (props) => {
-    
+
     const [preSelectedStock, setPreSelectedStock] = useState(null);
     
     const addStockTime = () => {
@@ -18,31 +18,48 @@ const Search = (props) => {
     }
 
     const handleDropdown = (event, data) => {
-        setPreSelectedStock(data.value)
+        setPreSelectedStock(data.value);
     } 
 
+    const fetchData = async() => {
+            let apiRes = null;
+            try {
+            apiRes = await axios.get(`http://localhost:3001/api/sector`);
+            } catch (err) {
+            apiRes = err.response;
+            console.log("mf sucka");
+
+            } finally {
+            console.log(apiRes); // Could be success or error
+            }
+            const stocks = apiRes.data;
+            setData(stocks); 
+    }
+
+    useEffect(() => {     
+        fetchData();
+    },[])
 
     const stockOptions = data.map(currentStock => ({
-        key: currentStock.abbreviation,
-        text: currentStock.name,
-        value: currentStock.abbreviation
+        key: currentStock[1],
+        text: currentStock[0],
+        value: currentStock[1]
     }));
 
     return (
         <div style={{padding:25}}>
-                <Dropdown
-                    placeholder='Stock'
-                    fluid
-                    search
-                    selection
-                    options={stockOptions}
-                    onChange={handleDropdown}
-                />
+            <Dropdown
+                placeholder='Stock'
+                fluid
+                search
+                selection
+                options={stockOptions}
+                onChange={handleDropdown}
+            /> 
             <br/>
-                <Button grey onClick={addStockTime}> Add Stock </Button>
-            </div>
-            
-        );
+            <Button grey onClick={addStockTime}> Add Stock </Button>
+        </div>    
+    );
 
     
 };
