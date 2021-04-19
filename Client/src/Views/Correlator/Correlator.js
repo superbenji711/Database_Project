@@ -105,7 +105,14 @@ const Correlator = () =>{
     }
     //open modal for sector perf
     const OpenMonthModal = () => {
+        console.log(showSectorGraph)
+        if (showSectorGraph) {
+            console.log('here')
+            setShowSectorGraph(false)
+        }
+        else {
         setShowMonthModal(true);
+        }
     }
     //close modal for sector perf
     const CloseMonthModal = () => {
@@ -132,6 +139,10 @@ const Correlator = () =>{
         if (selectedStock == null){
             alert('You did not select a stock')
             return
+        }
+        if (showCPIChart) {
+            setShowCPIChart(false);
+            return;
         }
         setLoaded(false);
         setShowMSChart(false);
@@ -177,6 +188,11 @@ const Correlator = () =>{
         if (selectedStock == null){
             alert('You did not select a stock')
             return
+        }
+
+        if (showMSChart) {
+            setShowMSChart(false)
+            return;
         }
         setLoaded(false);
         setShowCPIChart(false);
@@ -296,7 +312,7 @@ const Correlator = () =>{
                 <Grid.Row fluid>
                     <Button style={{width: 200,textAlign: 'center',}} onClick={cpiCorrelator}>Consumer Price Index</Button>
                     <Button style={{width: 200,textAlign: 'center',}} onClick={msCorrelator}>Money Stock</Button>       
-                     <Button style={{width: 200,textAlign: 'center',}} onClick={OpenMonthModal}>sectorPerformance </Button>
+                     <Button style={{width: 200,textAlign: 'center',}} onClick={OpenMonthModal}>Best Peformers by Sector </Button>
                 </Grid.Row>
                 <Grid.Row style={{paddingTop:50}}>
                     <Grid.Column>

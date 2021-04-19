@@ -3,9 +3,13 @@ import { Dropdown, Button, Grid, Header} from 'semantic-ui-react'
 import axios from 'axios';
 
 const Search = (props) => {
-
+    const [data, setData] = useState([])
     const [preSelectedStock, setPreSelectedStock] = useState(null);
     
+    useEffect(() => {     
+        fetchData();
+    },[])
+
     const addStockTime = () => {
        if (preSelectedStock != null) {
            props.addStock(preSelectedStock)
@@ -36,9 +40,7 @@ const Search = (props) => {
             setData(stocks); 
     }
 
-    useEffect(() => {     
-        fetchData();
-    },[])
+    
 
     const stockOptions = data.map(currentStock => ({
         key: currentStock[1],
