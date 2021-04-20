@@ -3,16 +3,45 @@ const config = require('../config');
 
 
 exports.getAll = async (req, res) => {
-
-    sql = `select distinct name, symbol, sector from sector JOIN mlmatoli.stock_value ON sector.symbol = stock_id`;
+    
+    sql = `select distinct name, symbol, sector from mlia.SECTOR JOIN mlmatoli.stock_value ON sector.symbol = stock_id`;
 
     bind={}
     connection = await oracledb.getConnection(config);
     
     results = await connection.execute(sql);
     res.send(results.rows);
+    
      
 } 
+
+exports.getDistribution = async (req, res) => {
+    console.log('here at least')
+    let Year = req.params.Year
+    console.log(Year)
+    sql = `SELECT * FROM
+    (
+    SelecT   avg("avg") FROM
+       (SELECT distinct mlmatoli.stock_value.stock_id as "id", avg(mlmatoli.STOCK_VALUE.HIGH_VAL) as "avg" FROM  mlmatoli.STOCK_VALUE
+                    WHERE  ((mlmatoli.STOCK_VALUE.STOCK_DATE >= 
+                        to_timestamp('${Year}-01-01T00:00:00.000Z', 'YYYY-MM-DD"T"HH24:MI:SS.ff3"Z"'))
+                        AND (mlmatoli.STOCK_VALUE.STOCK_DATE <= 
+                            to_timestamp('${Year}-12-31T00:00:00.000Z', 'YYYY-MM-DD"T"HH24:MI:SS.ff3"Z"')))
+              Group by mlmatoli.stock_value.stock_id)),
+             
+              (SELECT distinct mlmatoli.stock_value.stock_id as "id", avg(mlmatoli.STOCK_VALUE.HIGH_VAL) as "avg" FROM  mlmatoli.STOCK_VALUE
+                    WHERE  ((mlmatoli.STOCK_VALUE.STOCK_DATE >= 
+                        to_timestamp('${Year}-01-01T00:00:00.000Z', 'YYYY-MM-DD"T"HH24:MI:SS.ff3"Z"'))
+                        AND (mlmatoli.STOCK_VALUE.STOCK_DATE <= 
+                            to_timestamp('${Year}-12-31T00:00:00.000Z', 'YYYY-MM-DD"T"HH24:MI:SS.ff3"Z"')))
+              Group by mlmatoli.stock_value.stock_id)`;
+
+    bind= {}
+    connection = await oracledb.getConnection(config);
+    
+    results = await connection.execute(sql);
+    res.send(results.rows)
+}
 
 exports.getOne = async (req, res) => {
     console.log('here')
