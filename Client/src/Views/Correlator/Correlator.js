@@ -100,6 +100,7 @@ const Correlator = () =>{
     //update graph for sector performance
     const updateSectorGraph = (c) => {
         //console.log(sectorGraph.data)
+        setLoaded(true);
         setSectorDataPoints(c)
         setShowSectorGraph(true)
     }
@@ -108,7 +109,7 @@ const Correlator = () =>{
         console.log(showSectorGraph)
         if (showSectorGraph) {
             console.log('here')
-            setShowSectorGraph(false)
+            setShowSectorGraph(false);
         }
         else {
         setShowMonthModal(true);
@@ -123,6 +124,9 @@ const Correlator = () =>{
     const checkDateValues = () => {
         if ((startDate != null && endDate != null) && (startDate < endDate)) {
             CloseMonthModal();
+            setLoaded(false);
+            setShowCPIChart(false);
+            setShowMSChart(false);
             getPerformers();
         }
         else if (startDate >= endDate){
@@ -132,8 +136,6 @@ const Correlator = () =>{
             alert('You need to submit values')
         }
     }
-
-
 
     const cpiCorrelator = async() => {
         if (selectedStock == null){
@@ -146,6 +148,7 @@ const Correlator = () =>{
         }
         setLoaded(false);
         setShowMSChart(false);
+        setShowSectorGraph(false);
         let apiRes = null;
         let stock = selectedStock[1];
         console.log(stock);
@@ -196,6 +199,7 @@ const Correlator = () =>{
         }
         setLoaded(false);
         setShowCPIChart(false);
+        setShowSectorGraph(false);
         let apiRes = null;
         let stock = selectedStock[1];
         try {
@@ -312,7 +316,7 @@ const Correlator = () =>{
                 <Grid.Row fluid>
                     <Button style={{width: 200,textAlign: 'center',}} onClick={cpiCorrelator}>Consumer Price Index</Button>
                     <Button style={{width: 200,textAlign: 'center',}} onClick={msCorrelator}>Money Stock</Button>       
-                     <Button style={{width: 200,textAlign: 'center',}} onClick={OpenMonthModal}>Best Peformers by Sector </Button>
+                    <Button style={{width: 200,textAlign: 'center',}} onClick={OpenMonthModal}>Best Peformers by Sector </Button>
                 </Grid.Row>
                 <Grid.Row style={{paddingTop:50}}>
                     <Grid.Column>

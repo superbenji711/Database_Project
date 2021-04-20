@@ -27,7 +27,7 @@ app.use('/api/moneystock', moneyStockRoutes);
 app.use('/api/GDP',gdpRoute);
 app.use('/api/Index',indexRoute);
 app.use('/api/WEI',weiRoute);
-
+app.use('/api/stock',stockRoute);
 
 //server
 const port = process.env.PORT || 3001;
