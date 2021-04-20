@@ -15,9 +15,13 @@ const NavBar = () => {
                     <Menu.Item 
                         onClick={(view) => { setView("Home") }}>Home</Menu.Item>
                 </Link>
+                <Link to="/Stock Correlator">
+                    <Menu.Item 
+                        onClick={(view) => { setView("StockCorrelator") }}>Stock Correlator</Menu.Item>
+                </Link>
                 <Link to="/Correlator">
                     <Menu.Item 
-                        onClick={(view) => { setView("Correlator") }}>Correlator</Menu.Item>
+                        onClick={(view) => { setView("Correlator") }}>Economic Correlator</Menu.Item>
                         </Link>
                 </Menu.Menu>
             </Menu>

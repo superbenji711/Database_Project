@@ -49,7 +49,7 @@ const Search = (props) => {
     }));
 
     return (
-        <div style={{padding:25}}>
+        <div>
             <Dropdown
                 placeholder='Stock'
                 fluid
@@ -62,8 +62,6 @@ const Search = (props) => {
             <Button grey onClick={addStockTime}> Add Stock </Button>
         </div>    
     );
-
-    
 };
 
 export default Search;

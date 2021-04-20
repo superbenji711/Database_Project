@@ -22,6 +22,7 @@ exports.getPercentChanges = async(req, res) => {
         FROM mlia.money_stock
     )
     ON (to_number(to_char(value_date,'WW'))-1) = to_number(week) AND to_number(to_char(value_date,'YYYY')) = to_number(year)
+    ORDER BY value_date
     `
     bind={}
     connection = await oracledb.getConnection(config);

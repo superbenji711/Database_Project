@@ -222,4 +222,219 @@ exports.get = async (req,res) => {
     res.send(results.rows);
 }
 
+exports.getValue = async (req,res) => {
+    const {symbol: symbol} = req.params;
+    sql = `SELECT name, stock_date, close_val FROM mlia.SECTOR JOIN mlmatoli.stock_value ON symbol = stock_id WHERE SYMBOL = '${symbol}' ORDER BY stock_date`;
+    bind={}
+    connection = await oracledb.getConnection(config);
+    
+    results = await connection.execute(sql);
 
+    res.send(results.rows);
+}
+
+exports.correlatedPeaks= async (req, res) => {
+    const {symbol: symbol} = req.params;
+    sql =
+    `
+    SELECT stock1.stock_id, stock1.sector, CORR(stock1.ma50_zscore, stock2.ma50_zscore) FROM
+    (
+    SELECT stock_id, sector, stock_date, ma50_zscore
+    FROM(
+        WITH zscore_table AS
+        (
+            SELECT stock_id AS zscoreID, AVG(ma50) ma50Mean, STDDEV(ma50) ma50STD
+            FROM 
+            (
+                SELECT stock_id, AVG(dailyDifferent) OVER (ORDER BY stock_date ROWS BETWEEN 25 PRECEDING AND 25 FOLLOWING) as ma50
+                FROM (
+                    SELECT stock_id, stock_date, (close_val-prevDayClose) AS dailyDifferent
+                    FROM mlmatoli.stock_value JOIN
+                    (
+                        SELECT stock_id prevStock, sector, stock_date as prevDay, close_val AS prevDayClose
+                        FROM ( mlia.sector JOIN mlmatoli.stock_value ON symbol = stock_id )
+                        WHERE stock_id != '${symbol}'                   
+                    )
+                    ON stock_id = prevStock AND stock_date-1 = prevDay
+                    ORDER BY stock_id, stock_date
+                )
+            )
+            GROUP BY stock_id
+        )
+        SELECT stock_id, sector, stock_date, (ma50-ma50Mean)/ma50STD AS ma50_zscore
+        FROM
+        (
+            SELECT stock_id, sector, stock_date, AVG(dailyDifferent) OVER (ORDER BY stock_date ROWS BETWEEN 25 PRECEDING AND 25 FOLLOWING) as ma50
+            FROM (
+                SELECT stock_id, sector, stock_date, (close_val-prevDayClose) AS dailyDifferent
+                FROM mlmatoli.stock_value JOIN
+                (
+                    SELECT stock_id as prevStock, sector, stock_date as prevDay, close_val AS prevDayClose
+                    FROM ( mlia.sector JOIN mlmatoli.stock_value ON symbol = stock_id )
+                    WHERE stock_id != '${symbol}'                 
+                )
+                ON stock_id = prevStock AND stock_date-1 = prevDay
+                ORDER BY stock_id, stock_date
+            )
+        ),zscore_table
+        WHERE stock_id = zscoreID
+    )
+    WHERE ma50_zscore > 2.00
+    )stock1
+    JOIN
+    (
+    SELECT stock_id, sector, stock_date, ma50_zscore
+    FROM(
+        WITH zscore_table AS
+        (
+            SELECT AVG(ma50) ma50Mean, STDDEV(ma50) ma50STD
+            FROM 
+            (
+                SELECT
+                AVG(dailyDifferent) OVER (ORDER BY stock_date ROWS BETWEEN 25 PRECEDING AND 25 FOLLOWING) as ma50
+                FROM (
+                    SELECT stock_date, (close_val-prevDayClose) AS dailyDifferent
+                    FROM ( SELECT * FROM mlmatoli.stock_value WHERE stock_id = '${symbol}') JOIN
+                    (
+                        SELECT stock_date as prevDay, close_val AS prevDayClose
+                        FROM ( mlia.sector JOIN mlmatoli.stock_value ON symbol = stock_id )
+                        WHERE stock_id = '${symbol}'                   
+                    )
+                    ON stock_date-1 = prevDay
+                    ORDER BY stock_date
+                )
+            )
+        )
+        SELECT stock_id, sector, stock_date,(ma50-ma50Mean)/ma50STD AS ma50_zscore
+        FROM
+        (
+            SELECT stock_id, sector, stock_date, AVG(dailyDifferent) OVER (ORDER BY stock_date ROWS BETWEEN 25 PRECEDING AND 25 FOLLOWING) as ma50
+            FROM (
+                SELECT stock_id, sector, stock_date, (close_val-prevDayClose) AS dailyDifferent
+                FROM mlmatoli.stock_value JOIN
+                (
+                    SELECT stock_date as prevDay, sector, close_val AS prevDayClose
+                    FROM ( mlia.sector JOIN mlmatoli.stock_value ON symbol = stock_id )
+                    WHERE stock_id = '${symbol}'                   
+                )
+                ON stock_date-1 = prevDay
+                WHERE stock_id = '${symbol}'
+                ORDER BY stock_date
+            )
+        ),zscore_table
+    )
+    WHERE ma50_zscore > 2.00
+    ) stock2
+    ON stock1.stock_date = stock2.stock_date
+    GROUP BY stock1.stock_id,stock2.stock_id, stock1.sector, stock2.sector HAVING CORR(stock1.ma50_zscore, stock2.ma50_zscore) > 0.9
+    `
+    bind={}
+    connection = await oracledb.getConnection(config);
+    
+    results = await connection.execute(sql);
+
+    res.send(results.rows);
+}
+
+exports.correlatedFalls = async (req, res) => {
+    const {symbol: symbol} = req.params;
+    sql =
+    `
+    SELECT stock1.stock_id, stock1.sector, CORR(stock1.ma50_zscore, stock2.ma50_zscore) FROM
+    (
+    SELECT stock_id, sector, stock_date, ma50_zscore
+    FROM(
+        WITH zscore_table AS
+        (
+            SELECT stock_id AS zscoreID, AVG(ma50) ma50Mean, STDDEV(ma50) ma50STD
+            FROM 
+            (
+                SELECT stock_id, AVG(dailyDifferent) OVER (ORDER BY stock_date ROWS BETWEEN 25 PRECEDING AND 25 FOLLOWING) as ma50
+                FROM (
+                    SELECT stock_id, stock_date, (close_val-prevDayClose) AS dailyDifferent
+                    FROM mlmatoli.stock_value JOIN
+                    (
+                        SELECT stock_id prevStock, sector, stock_date as prevDay, close_val AS prevDayClose
+                        FROM ( mlia.sector JOIN mlmatoli.stock_value ON symbol = stock_id )
+                        WHERE stock_id != '${symbol}'                   
+                    )
+                    ON stock_id = prevStock AND stock_date-1 = prevDay
+                    ORDER BY stock_id, stock_date
+                )
+            )
+            GROUP BY stock_id
+        )
+        SELECT stock_id, sector, stock_date, (ma50-ma50Mean)/ma50STD AS ma50_zscore
+        FROM
+        (
+            SELECT stock_id, sector, stock_date, AVG(dailyDifferent) OVER (ORDER BY stock_date ROWS BETWEEN 25 PRECEDING AND 25 FOLLOWING) as ma50
+            FROM (
+                SELECT stock_id, sector, stock_date, (close_val-prevDayClose) AS dailyDifferent
+                FROM mlmatoli.stock_value JOIN
+                (
+                    SELECT stock_id as prevStock, sector, stock_date as prevDay, close_val AS prevDayClose
+                    FROM ( mlia.sector JOIN mlmatoli.stock_value ON symbol = stock_id )
+                    WHERE stock_id != '${symbol}'                 
+                )
+                ON stock_id = prevStock AND stock_date-1 = prevDay
+                ORDER BY stock_id, stock_date
+            )
+        ),zscore_table
+        WHERE stock_id = zscoreID
+    )
+    WHERE ma50_zscore < -2.00
+    )stock1
+    JOIN
+    (
+    SELECT stock_id, sector, stock_date, ma50_zscore
+    FROM(
+        WITH zscore_table AS
+        (
+            SELECT AVG(ma50) ma50Mean, STDDEV(ma50) ma50STD
+            FROM 
+            (
+                SELECT
+                AVG(dailyDifferent) OVER (ORDER BY stock_date ROWS BETWEEN 25 PRECEDING AND 25 FOLLOWING) as ma50
+                FROM (
+                    SELECT stock_date, (close_val-prevDayClose) AS dailyDifferent
+                    FROM ( SELECT * FROM mlmatoli.stock_value WHERE stock_id = '${symbol}') JOIN
+                    (
+                        SELECT stock_date as prevDay, close_val AS prevDayClose
+                        FROM ( mlia.sector JOIN mlmatoli.stock_value ON symbol = stock_id )
+                        WHERE stock_id = '${symbol}'                   
+                    )
+                    ON stock_date-1 = prevDay
+                    ORDER BY stock_date
+                )
+            )
+        )
+        SELECT stock_id, sector, stock_date,(ma50-ma50Mean)/ma50STD AS ma50_zscore
+        FROM
+        (
+            SELECT stock_id, sector, stock_date, AVG(dailyDifferent) OVER (ORDER BY stock_date ROWS BETWEEN 25 PRECEDING AND 25 FOLLOWING) as ma50
+            FROM (
+                SELECT stock_id, sector, stock_date, (close_val-prevDayClose) AS dailyDifferent
+                FROM mlmatoli.stock_value JOIN
+                (
+                    SELECT stock_date as prevDay, sector, close_val AS prevDayClose
+                    FROM ( mlia.sector JOIN mlmatoli.stock_value ON symbol = stock_id )
+                    WHERE stock_id = '${symbol}'                   
+                )
+                ON stock_date-1 = prevDay
+                WHERE stock_id = '${symbol}'
+                ORDER BY stock_date
+            )
+        ),zscore_table
+    )
+    WHERE ma50_zscore < -2.00
+    ) stock2
+    ON stock1.stock_date = stock2.stock_date
+    GROUP BY stock1.stock_id,stock2.stock_id, stock1.sector, stock2.sector HAVING CORR(stock1.ma50_zscore, stock2.ma50_zscore) > 0.9
+    `
+    bind={}
+    connection = await oracledb.getConnection(config);
+    
+    results = await connection.execute(sql);
+
+    res.send(results.rows);
+}

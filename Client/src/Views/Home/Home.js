@@ -12,77 +12,261 @@ var CanvasJSChart = CanvasJSReact.CanvasJSChart;
 const Home = (props) => {
 
     const [showStockModal, setShowStockModal] = useState(false);
-    const [showTimeModal, setShowTimeModal] = useState(false);
     const [goHome, setGoHome] = useState(false);
     const [goCalculator, setGoCalculator] = useState(false);
     const [selectedStock, setSelectedStock] = useState(null);
-    const [stocks, setStocks] = useState([]);
-    const [stockData, setStockData] = useState(null);
     const [stockNames, setStockNames] = useState(null);
-    const [startYear, setStartYear] = useState(null);
-    const [startMonth, setStartMonth] = useState(null);
-    const [endYear, setEndYear] = useState(null);
-    const [endMonth, setEndMonth] = useState(null);
-    const [dataPoints, setDataPoints] = useState([]);
-    const [dataFormatted, setDataFormatted] = useState(false);
-    
- 
+    const [showCorrelatedPeaksGraph, setShowCorrelatedPeaksGraph] = useState(false);
+    const [correlatedPeaksGraphData, setCorrelatedPeaksGraphData] = useState(false);
+    const [showCorrelatedFallsGraph, setShowCorrelatedFallsGraph] = useState(false);
+    const [correlatedFallsGraphData, setCorrelatedFallsGraphData] = useState(false);
+    const [isLoaded, setLoaded] = useState(false);
+    const [showDModal, setShowDModal] = useState(false);
+    const [DModalYear, setDModalYear] = useState(false);
+    const [distribData, setDistribData] = useState([]);
+    const [showDistributionGraph, setShowDistributionGraph] = useState(false);
+    const [showMonthModal, setShowMonthModal] = useState(false);
+    const [startDate, setStartDate] = useState(null);
+    const [endDate, setEndDate] = useState(null);
+    const [showSectorGraph, setShowSectorGraph] = useState(false);
+    const [sectorDataPoints, setSectorDataPoints] = useState([]);
+    const [mean, setMean] = useState(null)
 
-    let graphOptions = {
-        theme: "light2",
+    //displays number of tuples in database
+    const getCount = async() => {
+        let apiRes = null;
+        try {
+            apiRes = await axios.get(`http://localhost:3001/api/gdp/count`);
+          } catch (err) {
+            apiRes = err.response;
+            console.log("mf sucka");
+  
+          } finally {
+              console.log(apiRes.data); // Could be success or error
+          }
+          alert(`There are ${apiRes.data[0]} many tuples of stock values in the database. That is over 250,000!!`);
+          return;
+    }
+
+    const getInfo = async() => {
+        alert(
+            ` Analyzing stock market data is a key part of making succesful investments. However, we felt the playing field wasn't even. We decided to design a tool to empower the common investor with important trend analysis and performance calculations to help them make informed investments decisions.`
+        );
+        return;
+    }
+
+    const distribGraph = {
         title: {
-            text: `Stock Price of ${stocks}`
+            text: `Distribution of ${DModalYear} Stock Values with Mean = ${mean}`
         },
-        axisY: {
-            title: "Price per share of USD",
+        axisX: {
+            title: "Price per share in USD",
             prefix: "$"
         },
-        data: [{
-            type: "line",
-            xValueFormatString: "MMM-DD-YYYY",
-            //yValueFormatString: "$#,###.##",
-            dataPoints: dataPoints
-        }]
-    }
-
-    const updateGraphData = () => {
-        console.log(dataPoints)
-        graphOptions.data.dataPoints = dataPoints;
-        console.log(graphOptions)
-        setDataFormatted(true)
-        return;
-    } 
-
-    const formatGraphData = (data) => {
-        //setDataPoints([])
-        for (var i = 0; i < data.length; i++) {
-                let formattedDate = new Date (data[i][1])
-                formattedDate = formattedDate.toString();
-                let month = formattedDate.substring(4,7)
-                let day = formattedDate.substring(8,10)
-                let year = formattedDate.substring(11,16)
-                formattedDate = month + "-" + day + "-" + year
-            dataPoints.push({
-                x: new Date(formattedDate),
-                y: Number((data[i][0].toFixed(2)))
-            });
+        axisY: {
+            title: "Probability of having share value of x value",
+            
+        }, 
+        data: [
+        {
+            // Change type to "doughnut", "line", "splineArea", etc.
+            type: "spline",
+            dataPoints: distribData
         }
-    console.log(dataPoints)
-    updateGraphData();
+        ]
+    }
+    //get data for distrib graph
+    const DistributionData = async() => {
+        console.log(DModalYear)
+        if (DModalYear < 1983){
+            alert('Select a later day please')
+            return
+        }
+
+         if (showDistributionGraph) {
+            setShowDistributionGraph(false)
+            return;
+        } 
+        setLoaded(false);
+        setShowDistributionGraph(false);
+        let apiRes = null;
+        let data = []
+        try {
+          apiRes = await axios.get(`http://localhost:3001/api/sector/distrib/${DModalYear}`);
+        } catch (err) {
+          apiRes = err.response;
+          console.log("mf sucka");
+
+        } finally {
+            console.log(apiRes.data); // Could be success or error
+        }
+
+        console.log(apiRes.data[0][0])
+        let mean = apiRes.data[0][0];
+        let m = 1/mean
+        mean = mean.toFixed(0)
+
+        for (var i = 0; i < 20; i++) {
+            console.log(i)
+            let xVal =  Math.pow(2,i)
+            let yVal = m * Math.exp(-m*xVal)
+            console.log(xVal)
+            data.push({
+                label: xVal,
+                y: yVal*100
+            })
+        }
+        console.log(data) 
+
+        setMean(mean)
+        setDistribData(data);
+        setLoaded(true)
+        setShowDistributionGraph(true) 
+
+    }
+    //open Modal for Distrib graph
+    const OpenDModal = () => {
+        if (showDistributionGraph) {
+            return setShowDistributionGraph(false)
+        }
+        setShowDModal(true);
+        
+    }
+    //close modal for sector perf
+    const CloseDModal = () => {
+        DistributionData();
+        setShowDModal(false);
     }
 
-
-
-    const getGraphData = async() => {
+    //get data for sector performance graph
+    const getPerformers = async() => {
         let apiRes = null;
-        //console.log(stocks)
-        //stockIDs = stocks[0]
-        apiRes = await axios.get(`http://localhost:3001/api/sector/${stocks}/${startMonth}/${startYear}/${endMonth}/${endYear}`)
-        .then((response) => {
-            console.log('in then block')
-            setStockData(response.data)
-            formatGraphData(response.data);
+        let sD = String(startDate)
+        let dateData = sD.concat(String(endDate))
+        console.log(dateData)
+        apiRes = await axios.get(`http://localhost:3001/api/sector/performance/${dateData}`)
+                .then((response) => {
+                    console.log('in then block')
+                    //getPerformerData(response.data);
+                    console.log(response.data)
+                    formatSectorGraph(response.data);
+                })
+                .catch((error) => {
+                    console.log('sent here in catch')
+                    console.log(error)
+
+                    if (error.response) {
+                        console.log('im in here?')
+                        return { error: error.response.data.error };
+                    }
+                    return {
+                        error: "Unable to upload to database!"
+                    };
+                    
+                });
+                //console.log('the end of getPerformers called')
+                //console.log(sectorGraph)
+                
+    };
+
+    //format data for sector performance graph
+    const formatSectorGraph = (data) => {
+        let secOptions = {
+			//animationEnabled: true,
+			exportEnabled: true,
+			theme: "light2", //"light1", "dark1", "dark2"
+			title:{
+				text: `Best/Worst Performers by Sector in ${startDate}-${endDate}`
+			},
+			axisY: {
+				includeZero: true,
+                title: "Relative change in growth",
+                prefix: "%"
+			},
+            axisX: {
+                
+            },
+			data: [{
+				type: "column", //change type to bar, line, area, pie, etc
+				//indexLabel: "{y}", //Shows y value on all Data Points
+				indexLabelFontColor: "#5A5757",
+				indexLabelPlacement: "outside",
+				dataPoints: []
+			}]
+		}
+        let dp = []
+        console.log(data)
+        data.sort(function(a, b) {
+            return a[2].localeCompare(b[2]);
+          })
+        console.log(data)
+        data.map(d=>(
+            dp.push({label: String(d[1] + "-" + d[2] ),
+                    y: (Math.round(Number(d[3])))
+                })
+                
+        ))
+        console.log(dp)
+        
+        secOptions.data[0].dataPoints = dp
+        console.log(secOptions.data)
+        updateSectorGraph(secOptions)
+    };
+    //update graph for sector performance
+    const updateSectorGraph = (c) => {
+        //console.log(sectorGraph.data)
+        setLoaded(true);
+        setSectorDataPoints(c)
+        setShowSectorGraph(true)
+    }
+    //open modal for sector perf
+    const OpenMonthModal = () => {
+        console.log(showSectorGraph)
+        if (showSectorGraph) {
+            console.log('here')
+            setShowSectorGraph(false);
+        }
+        else {
+        setShowMonthModal(true);
+        }
+    }
+    //close modal for sector perf
+    const CloseMonthModal = () => {
+        setShowMonthModal(false);
+    }
+
+    //check Date values for sector performance
+    const checkDateValues = () => {
+        if ((startDate != null && endDate != null) && (startDate < endDate)) {
+            CloseMonthModal();
+            setLoaded(false);
+            getPerformers();
+        }
+        else if (startDate >= endDate){
+            alert('The start date must be before the end date')
+        }
+        else {
+            alert('You need to submit values')
+        }
+    }
+
+    const getCorrelatedPeaksData = async() => {
+        if (selectedStock == null){
+            alert('You did not select a stock')
+            return
+        }
+        if (showCorrelatedPeaksGraph) {
+            setShowCorrelatedPeaksGraph(false);
             return;
+        }
+        setLoaded(false);
+        setShowCorrelatedFallsGraph(false);
+        let apiRes = null;
+        let peaksData = [];
+        apiRes = await axios.get(`http://localhost:3001/api/stock/data/${selectedStock}`)
+        .then((response) => {
+            console.log(response.data)
+            peaksData.push(response.data);
         })
         .catch((error) => {
             console.log('sent here in catch')
@@ -97,41 +281,181 @@ const Home = (props) => {
               };
               
         });
+        let peaks = []
+        apiRes = await axios.get(`http://localhost:3001/api/stock/correlatedPeaks/${selectedStock}`)
+        .then((response) => {
+            peaks = response.data;
+        })
+        .catch((error) => {
+            console.log('sent here in catch')
+            console.log(error)
+
+            if (error.response) {
+                console.log('im in here?')
+                return { error: error.response.data.error };
+              }
+              return {
+                error: "Unable to upload to database!"
+              };
+              
+        });
+        for(let i= 0; i < peaks.length; i++){
+            apiRes = await axios.get(`http://localhost:3001/api/stock/data/${peaks[i][0]}`)
+            .then((response) => {
+                peaksData.push(response.data);
+            })
+            .catch((error) => {
+                console.log('sent here in catch')
+                console.log(error)
+
+                if (error.response) {
+                    console.log('im in here?')
+                    return { error: error.response.data.error };
+                }
+                return {
+                    error: "Unable to upload to database!"
+                };
+                
+            });
+        }
+        let correlatedPeaksGraphOption = [];
+        for(let i = 0; i < peaksData.length; i++){
+            let graphData = {type: 'spline',name:`${peaksData[i][0][0]}`,showInLegend:true,dataPoints:[]}
+            for(let j = 0; j < peaksData[i].length; j++){
+                let formattedDate = new Date (peaksData[i][j][1])
+                formattedDate = formattedDate.toString();
+                let month = formattedDate.substring(4,7)
+                let day = formattedDate.substring(8,10)
+                let year = formattedDate.substring(11,16)
+                formattedDate = month + "-" + day + "-" + year
+                graphData.dataPoints.push({
+                    x: new Date(formattedDate),
+                    y: Number((peaksData[i][j][2].toFixed(2)))
+            });
+            }
+            correlatedPeaksGraphOption.push(graphData);
+        }
+        setCorrelatedPeaksGraphData(correlatedPeaksGraphOption);
+        setShowCorrelatedPeaksGraph(true);
+        setLoaded(true);
     };
     
-    let sectorGraph = {
+
+    const getCorrelatedFallsData = async() => {
+        if (selectedStock == null){
+            alert('You did not select a stock')
+            return
+        }
+        if (showCorrelatedFallsGraph) {
+            setShowCorrelatedFallsGraph(false);
+            return;
+        }
+        setLoaded(false);
+        setShowCorrelatedPeaksGraph(false);
+        let apiRes = null;
+        let fallsData = [];
+        apiRes = await axios.get(`http://localhost:3001/api/stock/data/${selectedStock}`)
+        .then((response) => {
+            fallsData.push(response.data);
+        })
+        .catch((error) => {
+            console.log('sent here in catch')
+            console.log(error)
+
+            if (error.response) {
+                console.log('im in here?')
+                return { error: error.response.data.error };
+              }
+              return {
+                error: "Unable to upload to database!"
+              };
+              
+        });
+        let falls = []
+        apiRes = await axios.get(`http://localhost:3001/api/stock/correlatedFalls/${selectedStock}`)
+        .then((response) => {
+            falls = response.data;
+        })
+        .catch((error) => {
+            console.log('sent here in catch')
+            console.log(error)
+
+            if (error.response) {
+                console.log('im in here?')
+                return { error: error.response.data.error };
+              }
+              return {
+                error: "Unable to upload to database!"
+              };
+              
+        });
+        for(let i= 0; i < falls.length; i++){
+            apiRes = await axios.get(`http://localhost:3001/api/stock/data/${falls[i][0]}`)
+            .then((response) => {
+                fallsData.push(response.data);
+            })
+            .catch((error) => {
+                console.log('sent here in catch')
+                console.log(error)
+
+                if (error.response) {
+                    console.log('im in here?')
+                    return { error: error.response.data.error };
+                }
+                return {
+                    error: "Unable to upload to database!"
+                };
+                
+            });
+        }
+        let correlatedFallsGraphOption = [];
+        for(let i = 0; i < fallsData.length; i++){
+            let graphData = {type: 'spline',name:`${fallsData[i][0][0]}`,showInLegend:true,dataPoints:[]}
+            for(let j = 0; j < fallsData[i].length; j++){
+                let formattedDate = new Date (fallsData[i][j][1])
+                formattedDate = formattedDate.toString();
+                let month = formattedDate.substring(4,7)
+                let day = formattedDate.substring(8,10)
+                let year = formattedDate.substring(11,16)
+                formattedDate = month + "-" + day + "-" + year
+                graphData.dataPoints.push({
+                    x: new Date(formattedDate),
+                    y: Number((fallsData[i][j][2].toFixed(2)))
+            });
+            }
+            correlatedFallsGraphOption.push(graphData);
+        }
+        setCorrelatedFallsGraphData(correlatedFallsGraphOption);
+        setShowCorrelatedFallsGraph(true);
+        setLoaded(true);
+    };
+    
+
+    const correlatedPeaksGraph = {
         theme: "light2",
         title: {
-            text: `Stock Prices of Industry Leaders and Losers`
+            text: `Correlated Stock Peaks`
         },
         axisY: {
-            title: "Price per share USD",
+            title: "Closing Price",
             prefix: "$"
         },
-        data: [{
-            type: "spline",
-            name: "2016",
-            showInLegend: true,
-            dataPoints: null
-                
-            
-        },
-        {
-            type: "spline",
-            name: "2017",
-            showInLegend: true,
-            dataPoints: null
-        }]
+        data: correlatedPeaksGraphData
     }
-
+    const correlatedFallsGraph = {
+        theme: "light2",
+        title: {
+            text: `Correlated Stock Falls`
+        },
+        axisY: {
+            title: "Closing Price",
+            prefix: "$"
+        },
+        data: correlatedFallsGraphData
+    }
 
     const addStock = (data) => {
         setSelectedStock(data)
-        console.log(data)
-        /* let temp = []
-        temp = stocks
-        temp.push(data) */
-        setStocks(data)
     }
 
     if (goCalculator) {
@@ -153,88 +477,56 @@ const Home = (props) => {
         setShowStockModal(false);
     }
     
-    const checkDates = () => {
-        if ((startYear != null && endYear != null) && (startYear <= endYear)) {
-            CloseTimeModal();
-            getGraphData();
-            return;
-        }
-        else if (startYear >= endYear){
-            alert('The start date must be before the end date')
-        }
-        else {
-            alert('You need to submit values')
-        }
-    }
-
-    const OpenTimeModal = () => {
-        setShowTimeModal(true);
-    }
-
-    const CloseTimeModal = () => {
-        setShowTimeModal(false);
-    }
-
-
-    if (dataFormatted) {
-        //graphOptions.data.dataPoints = dataPoints
-        console.log(graphOptions.data)
-        return (
-            <div className="Home">
-    
-                <Container className="Container" text style={{ marginTop: '7em' }}>
-                    <Grid textAlign="center" verticalAlign="middle" centered>
-                        <Grid.Row centered>
-                            <Grid.Column>
-                                <Header textAlign='center' size='huge'>
-                                    Stocks Simplified
-                            </Header>
-                            </Grid.Column>
-                        </Grid.Row>
-                        <Grid.Row>
-                            <Search/>
-                        </Grid.Row>
-                        <Grid.Row>
-                            <h>Selected Stock: {stocks} </h>
-    
-                        </Grid.Row>
-                        <Grid.Row>
-                            <CanvasJSChart options = {graphOptions} 
-			                    />
-                        </Grid.Row>
-                    </Grid>
-                </Container>
-            </div>
-            )
-    }
-
-    else {
     return (
         <div className="Home">
-
             <Container className="Container" text style={{ marginTop: '7em' }}>
                 <Grid textAlign="center" verticalAlign="middle" centered>
                     <Grid.Row centered>
                         <Grid.Column>
                             <Header textAlign='center' size='huge'>
-                                Stocks Simplified
-                        </Header>
+                                Stocks Simplified.
+                            </Header>
+                            <Header textAlign='center' size='small' >
+                                Empowering the common investor!
+                            </Header>
+                            <Header textAlign='center' size='small'>
+                                Calculations and correlations performed are based on historical NASDAQ stock values.
+                            </Header>
                         </Grid.Column>
                     </Grid.Row>
+                    <Grid.Row fluid>
+                        <Button style={{width: 200,textAlign: 'center',}} onClick={getCount}>Woa, like how many tuples are there?</Button>
+                        <Button style={{width: 200,textAlign: 'center',}} onClick={getInfo}>Cool, but why Stock Simplified?</Button>
+                    </Grid.Row>
+                    <Header textAlign='center' size='medium'>
+                        Stock Market Performance Based On Time Periods
+                    </Header>
                     <Grid.Row>
-                        <Search stockNames = {stockNames}
-                            addStock={addStock}
-                            CloseStockModal={CloseStockModal} />
+                        <Button style={{width: 200,textAlign: 'center',}} onClick={OpenDModal}>Stock Value Distribution</Button>
+                        <Button style={{width: 200,textAlign: 'center',}} onClick={OpenMonthModal}>Best Peformers by Sector </Button>
                     </Grid.Row>
                     <Grid.Row>
-                        <h>Selected Stock: {stocks} </h>
-
+                        {isLoaded ? null : <Header>Waiting for data...</Header>}
+                        {showSectorGraph ? 
+                        <div style={{width:'100%'}}>
+                            <CanvasJSChart options = {sectorDataPoints}/>
+                            <Header>So what?</Header>
+                            <Header size='small'>This is shows the best and worst performing stocks by sector.{<br/>}
+                            You can use this to see which sectors tend to do well or poorly by their extreme performers over time. {<br/>}
+                            Example: Determine which sectors look promising based on their performance in the last 2 years to invest in.</Header>
+                        </div> 
+                        : null}
+                        {showDistributionGraph ? 
+                        <div style={{width:'100'}}>
+                            <CanvasJSChart options = {distribGraph}/> 
+                            <Header>So what?</Header>
+                            <Header size='small'>This shows the distribution of stock value in the market...{<br/>}
+                            You can use this to analyze how well your stock tends to do compared to the market.{<br/>}
+                            Example: If in previous years your stocks was below the market, but right now it is above the market mean than it might be a good time to sell.
+                            </Header>
+                        </div>
+                        : null}
                     </Grid.Row>
-                    <Grid.Row>
-                        <Button onClick={OpenTimeModal}>Select Time Period</Button>
-                    </Grid.Row>
-                    
-                    
                     <Modal open={showStockModal}
                         onClose={CloseStockModal}
                         closeIcon
@@ -247,9 +539,41 @@ const Home = (props) => {
                             CloseStockModal={CloseStockModal}
                         />
                     </Modal>
-                    
-                    <Modal open={showTimeModal}
-                        onClose={CloseTimeModal}
+                    <Modal open={showDModal}
+                        onClose={CloseDModal}
+                        closeIcon
+                        centered
+                        size="large"
+                    >
+                        <Modal.Header> What Year are you interested in? </Modal.Header>
+                            <Grid columns={2} divided>
+                                <Grid.Row>
+                                    <Grid.Column>
+                                        <Form>
+                                            <Form.Field
+                                            control={Input}
+                                            label="Start Year"
+                                            placeholder="Year"
+                                            fluid
+                                            required = {true}
+                                            onChange={(event) => setDModalYear(event.target.value)}
+                                            />
+                                        </Form>
+                                    </Grid.Column>
+                                </Grid.Row>
+                                <Grid.Row>
+                                    <GridColumn>
+                                    <Button centered="true"
+                                    onClick={CloseDModal}
+                                    >Ok</Button>    
+                                    </GridColumn>
+                                    
+                                </Grid.Row>
+                            
+                        </Grid>
+                    </Modal>
+                    <Modal open={showMonthModal}
+                        onClose={CloseMonthModal}
                         closeIcon
                         centered
                         size="large"
@@ -258,46 +582,18 @@ const Home = (props) => {
                             <Grid columns={2} divided>
                                 <Grid.Row>
                                     <Grid.Column>
-                                    <Form>
-                                        <Form.Field
-                                        control={Input}
-                                        label="Start Month"
-                                        placeholder="Start Month"
-                                        fluid
-                                        required = {true}
-                                        onChange={(event) => setStartMonth(event.target.value)}
-                                        />
-                                        </Form>
-                                    </Grid.Column>
-                                        
-                                    <Grid.Column>
                                         <Form>
-                                            <Form.Field
-                                            control={Input}
-                                            label="End Month"
-                                            placeholder="End Month"
-                                            fluid
-                                            required = {true}
-                                            onChange={(event) => setEndMonth(event.target.value)}
-                                            />
-                                        </Form>
-                                    </Grid.Column>
-                                </Grid.Row>
-                                <Grid.Row>
-                                    <Grid.Column>
-                                        <Form>
-                                            
                                             <Form.Field
                                             control={Input}
                                             label="Start Year"
                                             placeholder="Start Year"
                                             fluid
                                             required = {true}
-                                            onChange={(event) => setStartYear(event.target.value)}
+                                            onChange={(event) => setStartDate(event.target.value)}
                                             />
-
                                         </Form>
                                     </Grid.Column>
+                                        
                                     <Grid.Column>
                                         <Form>
                                             <Form.Field
@@ -306,16 +602,16 @@ const Home = (props) => {
                                             placeholder="End Year"
                                             fluid
                                             required = {true}
-                                            onChange={(event) => setEndYear(event.target.value)}
+                                            onChange={(event) => setEndDate(event.target.value)}
                                             />
                                         </Form>
-                                    </Grid.Column>    
+                                    </Grid.Column>
                                 </Grid.Row>
                                 <Grid.Row>
                                     <GridColumn>
                                     <Button centered="true"
-                                    onClick={checkDates}
-                                    >Load Graph</Button>    
+                                    onClick={checkDateValues}
+                                    >Ok</Button>    
                                     </GridColumn>
                                     
                                 </Grid.Row>
@@ -326,7 +622,6 @@ const Home = (props) => {
             </Container>
         </div>
     )
-    }
 }
 
 export default Home;
