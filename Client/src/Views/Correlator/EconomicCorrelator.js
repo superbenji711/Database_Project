@@ -94,7 +94,7 @@ const Correlator = () =>{
      const gdpCorrelatorGraph = {
         theme: "light2",
         title: {
-            text: `Stock Price of ${selectedStock}: Correlation Score w/ GDP = ${stockGDPCORR}`
+            text: `Correlation Score w/ GDP = ${stockGDPCORR}`
         },
         axisY: {
             title: "Price per share of USD",
@@ -290,32 +290,60 @@ const Correlator = () =>{
             <Grid textAlign="center" verticalAlign="middle" centered>
                 <Grid.Row centered>
                     <Grid.Column>
-                        <Header style={{ textAlign: 'center', fontSize: 40, fontWeight: 'bold' }}>
-                            Stock Correlator
-                        </Header>
+                    <Header textAlign='center' size='huge'>
+                        Economic Correlator.
+                    </Header>
+                    <Header textAlign='center'>Calculations and correlations performed are based on specific stock values and economic indicators.</Header>
                     </Grid.Column>
                 </Grid.Row>
-                <Header textAlign='center'>Calculations and correlations performed are based on specific stock values and economic indicators.</Header>
                 <Grid.Row centered>
                     <Search addStock={addStock} CloseStockModal={CloseStockModal}/>
+                </Grid.Row>
+                <Grid.Row>
+                    <Grid.Column>
+                        <Header  textAlign='center' size='medium'>Stock Selected: {selectedStock ? selectedStock[0] : ''}</Header>
+                        <Header  textAlign='center' size='medium'>Industry Sector: {selectedStock ? selectedStock[2] : ''}</Header>
+                    </Grid.Column>
                 </Grid.Row>
                 <Grid.Row fluid>
                     <Button style={{width: 200,textAlign: 'center',}} onClick={cpiCorrelator}>Consumer Price Index</Button>
                     <Button style={{width: 200,textAlign: 'center',}} onClick={msCorrelator}>Money Stock</Button>  
-                    <Button style={{width: 200,textAlign: 'center',}} onClick={gdpCorrelator}>Stock/GDP Correlation</Button>     
-                </Grid.Row>
-                <Grid.Row style={{paddingTop:50}}>
-                    <Grid.Column>
-                        <Header style={{fontSize: 25, fontWeight: 'bold' }} textAlign='center'>Stock Selected: {selectedStock ? selectedStock[0] : ''}</Header>
-                        <Header style={{fontSize: 25, fontWeight: 'bold' }} textAlign='center'>Industry Sector: {selectedStock ? selectedStock[2] : ''}</Header>
-                    </Grid.Column>
+                    <Button style={{width: 200,textAlign: 'center',}} onClick={gdpCorrelator}>Gross Domestic Product</Button>     
                 </Grid.Row>
                 <Grid.Row style={{paddingTop:50}}>
                     {isLoaded ? null : <Header>Waiting for data...</Header>}
-                    {showCPIChart ? <div style={{width:'100%'}}><CanvasJSChart options = {cpiChart}/><Header>*Statistically Significant: T-test score of correlation coefficient has p-value {"< 0.10"}</Header></div> : null}
-                    {showMSChart ? <CanvasJSChart options = {msChart}/> : null}
+                    {showCPIChart ? 
+                    <div style={{width:'100%'}}>
+                        <CanvasJSChart options = {cpiChart}/>
+                        <Header>*Statistically Significant: T-test score of correlation coefficient has p-value {"< 0.10"}</Header>
+                        <Header>So what?</Header>
+                        <Header size='small'>This shows the correlation of your stock's average monthly value compared to the monthy percent changes in the different categories of the economy's CPI over time...{<br/>}
+                            You can use this to make decisions on your stock based on the current economy's CPI value{<br/>}
+                            Example: If your stock has a statistically significant positive correlation with rises in monthly Communication CPI values; than if the Communication CPI values are currently rising it may be good to hold on to your stock.
+                        </Header>
+                    </div> 
+                    : null}
+                    {showMSChart ? 
+                    <div style={{width:'100%'}}>
+                        <CanvasJSChart options = {msChart}/>
+                        <Header>So what?</Header>
+                        <Header size='small'>This shows the correlation of your stock's average weekly value compared to the weekly money supply throughout time...{<br/>}
+                            You can use this to evaluate how correlated your stock's performance behavior is with the changes in the economy's money supply{<br/>}
+                            Example: If your stock tends to have negative correlations when money supply has peaked throught the economy's history than you may infer the value of your stock falls when money supply in the economy increases.
+                        </Header>
+                    </div> 
+                    : null}
                     {showGDPChart ? <CanvasJSChart options = {gdpCorrelatorGraph}/> : null}
-                    {showGDPChart2 ? <CanvasJSChart options = {gdpGraph}/> : null}
+                    {showGDPChart2 ? 
+                        <div style={{width:'100'}}>
+                            <CanvasJSChart options = {gdpGraph}/> 
+                            <Header>So what?</Header>
+                            <Header size='small'>This shows the correlation with your stock's average quarterly value compared to the economy's GDP value over time...{<br/>}
+                            You can use this to make decisions on your stock based on the current economy's GDP value{<br/>}
+                            Example: If your stock has a strong positive correlation with GDP and the GDP is currently declining than it may be a good time to sell.
+                            </Header>
+                        </div>
+                    : null}
                 </Grid.Row>
             </Grid>
         </Container>

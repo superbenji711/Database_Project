@@ -256,7 +256,7 @@ const StockCorrelator = (props) => {
                     <Grid.Row centered>
                         <Grid.Column>
                             <Header textAlign='center' size='huge'>
-                                Stocks Simplified
+                                Stock Correlator.
                             </Header>
                             <Header textAlign='center' size='small'>
                                 Calculations and correlations performed are based on historical NASDAQ stock values.
@@ -280,8 +280,26 @@ const StockCorrelator = (props) => {
                     </Grid.Row>
                     <Grid.Row>
                         {isLoaded ? null : <Header>Waiting for data...</Header>}
-                        {showCorrelatedFallsGraph ? <CanvasJSChart options = {correlatedFallsGraph}/> : null}
-                        {showCorrelatedPeaksGraph ? <CanvasJSChart options = {correlatedPeaksGraph}/> : null}
+                        {showCorrelatedFallsGraph? 
+                        <div style={{width:'100'}}>
+                            <CanvasJSChart options = {correlatedFallsGraph}/> 
+                            <Header>So what?</Header>
+                            <Header size='small'>This shows other stocks in the market whose dips in their 50-day moving average value correlated to your selected stock's dips over time...{<br/>}
+                            You can use this to make decisions on your stock based on the performance of others{<br/>}
+                            Example: If in previous years dips in CVS health correlated to dips in your stock and CVS health's stock value is currently falling, it may be a good time to sell your stock too.
+                            </Header>
+                        </div>
+                        : null}
+                        {showCorrelatedPeaksGraph? 
+                        <div style={{width:'100'}}>
+                            <CanvasJSChart options = {correlatedPeaksGraph}/> 
+                            <Header>So what?</Header>
+                            <Header size='small'>This shows other stocks in the market whose peaks in their 50-day moving average value correlated to your selected stock's peaks over time...{<br/>}
+                            You can use this to make decisions on your stock based on the performance of others{<br/>}
+                            Example: If in previous years peaks in CVS health correlated to peaks in your stock and your stock's value is currently rising, it may be a good time to buy also buy CVS health stock too.
+                            </Header>
+                        </div>
+                        : null}
                     </Grid.Row>
                     <Modal open={showStockModal}
                         onClose={CloseStockModal}

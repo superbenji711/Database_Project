@@ -48,6 +48,13 @@ const Home = (props) => {
           return;
     }
 
+    const getInfo = async() => {
+        alert(
+            ` Analyzing stock market data is a key part of making succesful investments. However, we felt the playing field wasn't even. We decided to design a tool to empower the common investor with important trend analysis and performance calculations to help them make informed investments decisions.`
+        );
+        return;
+    }
+
     const distribGraph = {
         title: {
             text: `Distribution of ${DModalYear} Stock Values with Mean = ${mean}`
@@ -477,7 +484,10 @@ const Home = (props) => {
                     <Grid.Row centered>
                         <Grid.Column>
                             <Header textAlign='center' size='huge'>
-                                Stocks Simplified
+                                Stocks Simplified.
+                            </Header>
+                            <Header textAlign='center' size='small' >
+                                Empowering the common investor!
                             </Header>
                             <Header textAlign='center' size='small'>
                                 Calculations and correlations performed are based on historical NASDAQ stock values.
@@ -486,6 +496,7 @@ const Home = (props) => {
                     </Grid.Row>
                     <Grid.Row fluid>
                         <Button style={{width: 200,textAlign: 'center',}} onClick={getCount}>Woa, like how many tuples are there?</Button>
+                        <Button style={{width: 200,textAlign: 'center',}} onClick={getInfo}>Cool, but why Stock Simplified?</Button>
                     </Grid.Row>
                     <Header textAlign='center' size='medium'>
                         Stock Market Performance Based On Time Periods
@@ -494,27 +505,27 @@ const Home = (props) => {
                         <Button style={{width: 200,textAlign: 'center',}} onClick={OpenDModal}>Stock Value Distribution</Button>
                         <Button style={{width: 200,textAlign: 'center',}} onClick={OpenMonthModal}>Best Peformers by Sector </Button>
                     </Grid.Row>
-                    <Header textAlign='center' size='medium'>
-                        Specific Stock Performance Correlations
-                    </Header>
-                    <Grid.Row>
-                        <Search stockNames = {stockNames}
-                            addStock={addStock}
-                            CloseStockModal={CloseStockModal} />
-                    </Grid.Row>
-                    <Grid.Row centered>
-                        <Header  textAlign='center' size='medium'>Selected Stock: {selectedStock} </Header>
-                    </Grid.Row>
-                    <Grid.Row>
-                        <Button style={{width: 200,textAlign: 'center'}} onClick={getCorrelatedFallsData}>Correlated Falls</Button>
-                        <Button style={{width: 200,textAlign: 'center'}} onClick={getCorrelatedPeaksData}>Correlated Peaks</Button>
-                    </Grid.Row>
                     <Grid.Row>
                         {isLoaded ? null : <Header>Waiting for data...</Header>}
-                        {showCorrelatedFallsGraph ? <CanvasJSChart options = {correlatedFallsGraph}/> : null}
-                        {showCorrelatedPeaksGraph ? <CanvasJSChart options = {correlatedPeaksGraph}/> : null}
-                        {showSectorGraph ? <CanvasJSChart options = {sectorDataPoints}/> : null}
-                        {showDistributionGraph ? <CanvasJSChart options = {distribGraph}/> : null}
+                        {showSectorGraph ? 
+                        <div style={{width:'100%'}}>
+                            <CanvasJSChart options = {sectorDataPoints}/>
+                            <Header>So what?</Header>
+                            <Header size='small'>This is shows the best and worst performing stocks by sector.{<br/>}
+                            You can use this to see which sectors tend to do well or poorly by their extreme performers over time. {<br/>}
+                            Example: Determine which sectors look promising based on their performance in the last 2 years to invest in.</Header>
+                        </div> 
+                        : null}
+                        {showDistributionGraph ? 
+                        <div style={{width:'100'}}>
+                            <CanvasJSChart options = {distribGraph}/> 
+                            <Header>So what?</Header>
+                            <Header size='small'>This shows the distribution of stock value in the market...{<br/>}
+                            You can use this to analyze how well your stock tends to do compared to the market.{<br/>}
+                            Example: If in previous years your stocks was below the market, but right now it is above the market mean than it might be a good time to sell.
+                            </Header>
+                        </div>
+                        : null}
                     </Grid.Row>
                     <Modal open={showStockModal}
                         onClose={CloseStockModal}
